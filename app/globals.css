@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.spinner {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: radial-gradient(farthest-side, #2563eb 94%, #0000) top/3.8px
+			3.8px no-repeat,
+		conic-gradient(#0000 30%, #2563eb);
+	-webkit-mask: radial-gradient(
+		farthest-side,
+		#0000 calc(100% - 3.8px),
+		#000 0
+	);
+	animation: spinner-c7wet2 1s infinite linear;
+}
+
+.spinner-large {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: radial-gradient(farthest-side, #2563eb 94%, #0000) top/3.8px
+			3.8px no-repeat,
+		conic-gradient(#0000 30%, #2563eb);
+	-webkit-mask: radial-gradient(
+		farthest-side,
+		#0000 calc(100% - 3.8px),
+		#000 0
+	);
+	animation: spinner-c7wet2 1s infinite linear;
+}
+
+@keyframes spinner-c7wet2 {
+	100% {
+		transform: rotate(1turn);
+	}
+}
+
+.spinner-white {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: radial-gradient(farthest-side, #ffffff 94%, #0000) top/3.8px
+			3.8px no-repeat,
+		conic-gradient(#0000 30%, #ffffff);
+	-webkit-mask: radial-gradient(
+		farthest-side,
+		#0000 calc(100% - 3.8px),
+		#000 0
+	);
+	animation: spinner-c7wet2 1s infinite linear;
+}
+
+.spinner-white-large {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: radial-gradient(farthest-side, #ffffff 94%, #0000) top/3.8px
+			3.8px no-repeat,
+		conic-gradient(#0000 30%, #ffffff);
+	-webkit-mask: radial-gradient(
+		farthest-side,
+		#0000 calc(100% - 3.8px),
+		#000 0
+	);
+	animation: spinner-c7wet2 1s infinite linear;
+}
+
+@keyframes spinner-c7wet2 {
+	100% {
+		transform: rotate(1turn);
+	}
+}
+
+.spinner-dark {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: radial-gradient(farthest-side, #000000 94%, #0000) top/3.8px
+			3.8px no-repeat,
+		conic-gradient(#0000 30%, #000000);
+	-webkit-mask: radial-gradient(
+		farthest-side,
+		#0000 calc(100% - 3.8px),
+		#000 0
+	);
+	animation: spinner-c7wet2 1s infinite linear;
+}
+
+.spinner-dark-large {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: radial-gradient(farthest-side, #000000 94%, #0000) top/3.8px
+			3.8px no-repeat,
+		conic-gradient(#0000 30%, #000000);
+	-webkit-mask: radial-gradient(
+		farthest-side,
+		#0000 calc(100% - 3.8px),
+		#000 0
+	);
+	animation: spinner-c7wet2 1s infinite linear;
+}
+
+@keyframes spinner-c7wet2 {
+	100% {
+		transform: rotate(1turn);
+	}
+}
