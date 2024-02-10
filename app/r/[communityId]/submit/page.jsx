@@ -1,6 +1,6 @@
 "use client";
 import PageLayout from "@/components/PageLayout/PageLayout";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { IoDocumentText, IoImageOutline } from "react-icons/io5";
 import { GoLink } from "react-icons/go";
 import { BiPoll } from "react-icons/bi";
@@ -19,9 +19,8 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { setShowAuthModal } from "@/redux/actions";
 import AboutCommunity from "@/components/About/AboutCommunity";
+import { authModalContext } from "@/contexts/AuthModalContext";
 
 const tabs = [
 	{ name: "Post", icon: <IoDocumentText className="z-10 h-6 w-6" /> },
@@ -44,14 +43,14 @@ function CreatePostPage() {
 		body: "",
 	});
 
-	const dispatch = useDispatch();
 	const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
+	const { setShowAuthModal } = useContext(authModalContext);
 
 	async function createPost(e) {
 		e.preventDefault();
 		if (!user) {
 			toast.error("Sign in to create Post");
-			dispatch(setShowAuthModal(true));
+			setShowAuthModal(true);
 			return;
 		}
 		if (formData.title === "" || formData.body === "") {

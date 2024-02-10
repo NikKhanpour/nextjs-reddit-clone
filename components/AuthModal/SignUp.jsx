@@ -1,18 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
 import { inputClasses } from "@/constants/inputClasses";
-import Button from "../Button/Button";
-import {
-	setAuthModalStage,
-	setShowAuthModal,
-	setUserData,
-} from "@/redux/actions";
+import Button from "../UI/Button/Button";
 import { toast } from "react-toastify";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, firestore } from "@/firebase-config";
+import { authModalContext } from "@/contexts/AuthModalContext";
 
 const variants = {
 	show: {
@@ -36,8 +31,12 @@ const variants = {
 };
 
 function SignUp() {
-	const authModal = useSelector((state) => state.authModal);
-	const dispatch = useDispatch();
+	const {
+		showAuthModal,
+		setShowAuthModal,
+		authModalStage,
+		setAuthModalStage,
+	} = useContext(authModalContext);
 
 	const [createUserWithEmailAndPassword, user, loading, error] =
 		useCreateUserWithEmailAndPassword(auth);
@@ -69,10 +68,8 @@ function SignUp() {
 			formData.password
 		);
 		if (data) {
-			dispatch(setShowAuthModal(false));
+			setShowAuthModal(false);
 			toast.info("Signed up successfully");
-
-			dispatch(setUserData(data.user));
 
 			const userDocRef = doc(firestore, "users", data.user.uid);
 			await setDoc(userDocRef, {
@@ -101,7 +98,7 @@ function SignUp() {
 
 	return (
 		<AnimatePresence mode="popLayout">
-			{authModal.stage === "signUp" && (
+			{authModalStage === "signUp" && (
 				<motion.div
 					variants={variants}
 					initial="hidden"
@@ -166,9 +163,7 @@ function SignUp() {
 							<p className="text-sm">
 								Already Reddited?{" "}
 								<span
-									onClick={() =>
-										dispatch(setAuthModalStage("login"))
-									}
+									onClick={() => setAuthModalStage("login")}
 									className="cursor-pointer text-blue-500 dark:text-blue-600"
 								>
 									Log in

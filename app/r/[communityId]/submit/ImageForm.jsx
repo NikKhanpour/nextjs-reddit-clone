@@ -1,10 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
-import Button from "@/components/Button/Button";
+import Button from "@/components/UI/Button/Button";
 import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaPlus } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
+import Image from "next/image";
 
 const variants = {
 	hidden: {
@@ -49,9 +49,11 @@ function ImageForm({
 					{selectedFile ? (
 						<>
 							<div className="relative m-4 flex items-center justify-center">
-								<img
+								<Image
 									src={selectedFile}
-									className="max-h-[300px] max-w-[300px] rounded-lg md:max-h-[400px] md:max-w-[400px]"
+									width="1000"
+									height="1000"
+									className="max-h-[300px] max-w-[300px] rounded-lg"
 									alt="your image"
 								/>
 								<IoClose

@@ -1,13 +1,13 @@
 "use client";
+import { userDataContext } from "@/contexts/UserDataContext";
 import { auth, firestore } from "@/firebase-config";
-import { setUserCommunitySnippets, setUserVotedPosts } from "@/redux/actions";
 import { collection, getDocs } from "firebase/firestore";
+import { useContext } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useDispatch } from "react-redux";
 
 function useUserData() {
 	const [user] = useAuthState(auth);
-	const dispatch = useDispatch();
+	const { setCommunitySnippets, setVotedPosts } = useContext(userDataContext);
 
 	async function getUserCommunitySnippets(userId = user && user.uid) {
 		if (!user) return;
@@ -20,7 +20,7 @@ function useUserData() {
 				id: doc.id,
 				...doc.data(),
 			}));
-			dispatch(setUserCommunitySnippets(snippets));
+			setCommunitySnippets(snippets);
 		} catch (error) {
 			console.log("getUserCommunitySnippets", error);
 		}
@@ -37,7 +37,7 @@ function useUserData() {
 				id: doc.id,
 				...doc.data(),
 			}));
-			dispatch(setUserVotedPosts(votedPosts));
+			setVotedPosts(votedPosts);
 		} catch (error) {
 			console.log("getUserVotedPosts", error);
 		}

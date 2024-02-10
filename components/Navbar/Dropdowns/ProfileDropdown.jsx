@@ -7,11 +7,10 @@ import { auth } from "@/firebase-config";
 import { IoIosArrowDown } from "react-icons/io";
 import { motion } from "framer-motion";
 import { HiOutlineUserCircle } from "react-icons/hi2";
-import DarkmodeButton from "@/darkmode/DarkmodeButton";
-import { setUser, setUserData } from "@/redux/actions";
 import { useSignOut } from "react-firebase-hooks/auth";
-import { themeContext } from "@/darkmode/ThemeContext";
-import { useDispatch } from "react-redux";
+import { themeContext } from "@/contexts/ThemeContext";
+import { userDataContext } from "@/contexts/UserDataContext";
+import Switch from "@/components/UI/Switch/Switch";
 
 function ProfileDropdown() {
 	const [open, setOpen] = useState(false);
@@ -20,13 +19,12 @@ function ProfileDropdown() {
 	const [signOut, loading, error] = useSignOut(auth);
 
 	const { darkmode, setDarkmode } = useContext(themeContext);
-
-	const dispatch = useDispatch();
+	const { setUserData } = useContext(userDataContext);
 
 	async function handleSignOut() {
 		const success = await signOut();
 		if (success) {
-			dispatch(setUserData(null));
+			setUserData(null);
 		}
 	}
 	return (
@@ -82,7 +80,9 @@ function ProfileDropdown() {
 					className="flex w-full cursor-pointer items-center justify-between py-2 pe-7 ps-10 hover:bg-gray-100 dark:hover:bg-zinc-700"
 				>
 					<p>Darkmode</p>
-					<DarkmodeButton />
+					<div onClick={() => setDarkmode(!darkmode)}>
+						<Switch value={darkmode} />
+					</div>
 				</div>
 				<div className="mx-auto h-[1px] w-[90%] bg-gray-200 dark:bg-zinc-700" />
 				<p className="w-full cursor-pointer px-10 py-2 duration-300 hover:bg-gray-100 dark:hover:bg-zinc-700">

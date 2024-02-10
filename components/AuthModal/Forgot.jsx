@@ -1,13 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
 import { inputClasses } from "@/constants/inputClasses";
-import Button from "../Button/Button";
-import { setAuthModalStage } from "@/redux/actions";
+import Button from "../UI/Button/Button";
 import { toast } from "react-toastify";
 import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase-config";
+import { authModalContext } from "@/contexts/AuthModalContext";
 
 const variants = {
 	show: {
@@ -31,8 +30,7 @@ const variants = {
 };
 
 function Forgot() {
-	const authModal = useSelector((state) => state.authModal);
-	const dispatch = useDispatch();
+	const { authModalStage, setAuthModalStage } = useContext(authModalContext);
 
 	const [email, setEmail] = useState("");
 
@@ -47,7 +45,7 @@ function Forgot() {
 		}
 		await sendPasswordResetEmail(email);
 		toast.info("Reset Password Link Sent");
-		dispatch(setAuthModalStage("login"));
+		setAuthModalStage("login");
 	}
 
 	useEffect(() => {
@@ -58,7 +56,7 @@ function Forgot() {
 
 	return (
 		<AnimatePresence mode="popLayout">
-			{authModal.stage === "forgot" && (
+			{authModalStage === "forgot" && (
 				<motion.div
 					variants={variants}
 					initial="hidden"
@@ -98,9 +96,7 @@ function Forgot() {
 							<p className="py-3 text-sm">
 								Back to{" "}
 								<span
-									onClick={() =>
-										dispatch(setAuthModalStage("login"))
-									}
+									onClick={() => setAuthModalStage("login")}
 									className="cursor-pointer text-blue-500 dark:text-blue-600"
 								>
 									Login

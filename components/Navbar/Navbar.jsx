@@ -1,10 +1,8 @@
 "use client";
-import React from "react";
+import React, { useContext } from "react";
 import { FaReddit } from "react-icons/fa";
 import Search from "./Search";
-import Button from "../Button/Button";
-import { useDispatch } from "react-redux";
-import { setAuthModalStage, setShowAuthModal } from "@/redux/actions";
+import Button from "../UI/Button/Button";
 import AuthModal from "../AuthModal/AuthModal";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase-config";
@@ -12,6 +10,8 @@ import ProfileDropdown from "./Dropdowns/ProfileDropdown";
 import HomeDropdown from "./Dropdowns/HomeDropdown";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { authModalContext } from "@/contexts/AuthModalContext";
+import Image from "next/image";
 
 const variants = {
 	hidden: {
@@ -35,7 +35,8 @@ const variants = {
 };
 
 function Navbar() {
-	const dispatch = useDispatch();
+	const { setShowAuthModal, setAuthModalStage } =
+		useContext(authModalContext);
 
 	const [user, loading] = useAuthState(auth);
 
@@ -50,10 +51,20 @@ function Navbar() {
 					className="sticky top-0 z-20 flex w-full items-center bg-white p-2 shadow-md dark:bg-zinc-900"
 				>
 					<div className="flex items-center space-x-2">
-						<Link href="/" className="flex items-center">
-							<FaReddit className="h-10 w-10 text-black dark:text-white" />
-							<img
-								className="hidden w-[65px] md:flex"
+						<Link
+							href="/"
+							className="flex w-[30px] items-center md:w-[80px]"
+						>
+							<Image
+								src="/reddit-logo.svg"
+								alt="logo"
+								width="30"
+								height="30"
+							/>
+							<Image
+								width="50"
+								height="50"
+								className="ms-2 hidden md:flex"
 								src="/reddit-text.svg"
 								alt="icon"
 							/>
@@ -68,13 +79,13 @@ function Navbar() {
 							<div className="flex items-center space-x-2">
 								<div
 									onClick={() => {
-										dispatch(setAuthModalStage("login"));
-										dispatch(setShowAuthModal(true));
+										setShowAuthModal(true);
+										setAuthModalStage("login");
 									}}
 								>
 									<Button
 										className={
-											"dark:hover:border-blue-500 w-32 mx-auto py-0 dark:hover:bg-blue-500 dark:hover:text-white"
+											"dark:hover:border-blue-500 w-24 md:w-32 mx-auto py-0 dark:hover:bg-blue-500 dark:hover:text-white"
 										}
 									>
 										Login
@@ -82,9 +93,10 @@ function Navbar() {
 								</div>
 								<div
 									onClick={() => {
-										dispatch(setAuthModalStage("signUp"));
-										dispatch(setShowAuthModal(true));
+										setShowAuthModal(true);
+										setAuthModalStage("signUp");
 									}}
+									className="hidden lg:flex"
 								>
 									<Button
 										outline

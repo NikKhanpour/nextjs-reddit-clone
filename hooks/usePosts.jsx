@@ -1,5 +1,7 @@
+import { authModalContext } from "@/contexts/AuthModalContext";
+import { postsContext } from "@/contexts/PostsContext";
+import { userDataContext } from "@/contexts/UserDataContext";
 import { auth, firestore, storage } from "@/firebase-config";
-import { setPosts, setSelectedPost, setUserVotedPosts } from "@/redux/actions";
 import {
 	collection,
 	deleteDoc,
@@ -8,15 +10,16 @@ import {
 	writeBatch,
 } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
+import { useContext } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useDispatch, useSelector } from "react-redux";
 
 function usePosts() {
 	const [user] = useAuthState(auth);
 
-	const { posts, selectedPost } = useSelector((state) => state.postsState);
-	const { votedPosts } = useSelector((state) => state.userData);
-	const dispatch = useDispatch();
+	const { posts, selectedPost, setSelectedPost, setPosts } =
+		useContext(postsContext);
+	const { votedPosts, setVotedPosts } = useContext(userDataContext);
+	const { setShowAuthModal } = useContext(authModalContext);
 
 	async function deletePost(post) {
 		try {
@@ -28,7 +31,7 @@ function usePosts() {
 			const postDocRef = doc(firestore, `posts/${post.id}`);
 			await deleteDoc(postDocRef);
 
-			dispatch(setPosts(posts.filter((item) => item.id !== post.id)));
+			setPosts(posts.filter((item) => item.id !== post.id));
 			return true;
 		} catch (error) {
 			console.log("deletePost", error);
@@ -36,6 +39,10 @@ function usePosts() {
 	}
 
 	async function onVotePost(post, voteValue) {
+		if (!user) {
+			setShowAuthModal(true);
+			return;
+		}
 		const batch = writeBatch(firestore);
 
 		const existingVote = votedPosts.find((vote) => vote.postId === post.id);
@@ -121,9 +128,9 @@ function usePosts() {
 			}
 		}
 		await batch.commit();
-		dispatch(setPosts(updatedPosts));
-		dispatch(setUserVotedPosts(updatedVotedPosts));
-		selectedPost.id === post.id && dispatch(setSelectedPost(updatedPost));
+		setPosts(updatedPosts);
+		setVotedPosts(updatedVotedPosts);
+		selectedPost.id === post.id && setSelectedPost(updatedPost);
 	}
 
 	return { deletePost, onVotePost };

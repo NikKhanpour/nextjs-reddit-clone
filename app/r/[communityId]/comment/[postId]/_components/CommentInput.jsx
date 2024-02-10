@@ -1,11 +1,11 @@
-import Button from "@/components/Button/Button";
+"use client";
+import Button from "@/components/UI/Button/Button";
 import { inputClasses } from "@/constants/inputClasses";
+import { authModalContext } from "@/contexts/AuthModalContext";
+import { commentsContext } from "@/contexts/CommentsContext";
+import { currentCommunityContext } from "@/contexts/CurrentCommunityContext";
+import { postsContext } from "@/contexts/PostsContext";
 import { auth, firestore } from "@/firebase-config";
-import {
-	setComments,
-	setSelectedPost,
-	setShowAuthModal,
-} from "@/redux/actions";
 import {
 	collection,
 	doc,
@@ -13,25 +13,23 @@ import {
 	serverTimestamp,
 	writeBatch,
 } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 
-function CommentInput() {
+function CommentInput({ replyTo, commentReplies, setCommentReplies }) {
 	const [user] = useAuthState(auth);
 	const [commentInput, setCommentInput] = useState("");
 	const [loading, setLoading] = useState(false);
 
-	const { currentCommunity } = useSelector((state) => state.community);
-	const { selectedPost } = useSelector((state) => state.postsState);
-	const { comments } = useSelector((state) => state.commentsState);
-	const dispatch = useDispatch();
+	const { currentCommunity } = useContext(currentCommunityContext);
+	const { setShowAuthModal } = useContext(authModalContext);
+	const { selectedPost, setSelectedPost } = useContext(postsContext);
+	const { comments, setComments } = useContext(commentsContext);
 
 	async function createComment() {
 		if (commentInput === "") return;
 		if (!user) {
-			dispatch(setShowAuthModal(true));
+			setShowAuthModal(true);
 			return;
 		}
 
@@ -43,35 +41,40 @@ function CommentInput() {
 			communityId: currentCommunity.communityId,
 			postId: selectedPost.id,
 			postTitle: selectedPost.title,
-			comment: commentInput,
+			text: commentInput,
+			replyTo: replyTo ? replyTo : selectedPost.id,
 			createdAt: serverTimestamp(),
 			voteStatus: 0,
 		};
 
-		console.log(newComment);
 		const batch = writeBatch(firestore);
 		try {
 			setLoading(true);
 
 			batch.set(commentDocRef, newComment);
 
-			const postDocRef = doc(firestore, "posts", selectedPost.id);
-			batch.update(postDocRef, {
-				numberOfComments: increment(1),
-			});
+			if (!replyTo) {
+				const postDocRef = doc(firestore, "posts", selectedPost.id);
+				batch.update(postDocRef, {
+					numberOfComments: increment(1),
+				});
+			}
 
 			await batch.commit();
 
 			newComment.createdAt = { seconds: new Date() / 1000 };
 
-			dispatch(setComments([newComment, ...comments]));
-			dispatch(
+			setComments([newComment, ...comments]);
+
+			if (!replyTo) {
 				setSelectedPost({
 					...selectedPost,
 					numberOfComments: selectedPost.numberOfComments + 1,
-				})
-			);
-
+				});
+			}
+			if (replyTo) {
+				setCommentReplies([...commentReplies, newComment]);
+			}
 			setCommentInput("");
 		} catch (error) {
 			console.log("createComment", error);

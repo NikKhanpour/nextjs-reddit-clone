@@ -4,26 +4,21 @@ import { FcGoogle } from "react-icons/fc";
 import { useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { auth, firestore } from "@/firebase-config";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { setShowAuthModal, setUser } from "@/redux/actions";
 import { doc, setDoc } from "firebase/firestore";
-import { themeContext } from "@/darkmode/ThemeContext";
+import { themeContext } from "@/contexts/ThemeContext";
+import { userDataContext } from "@/contexts/UserDataContext";
+import { authModalContext } from "@/contexts/AuthModalContext";
 
 function GoogleProvider() {
 	const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
 
-	const dispatch = useDispatch();
-
 	const { darkmode } = useContext(themeContext);
+	const { setUserData } = useContext(userDataContext);
+	const { setShowAuthModal } = useContext(authModalContext);
 
 	async function handleSignInWithGoogle() {
 		const data = await signInWithGoogle();
 		if (data) {
-			toast.info("Signed in succeessfully");
-			dispatch(setShowAuthModal(false));
-
-			dispatch(setUserData(data.user));
-
 			const userDocRef = doc(firestore, "users", data.user.uid);
 			await setDoc(userDocRef, {
 				email: data.user.email,
@@ -33,6 +28,10 @@ function GoogleProvider() {
 				lastLoginAt: data.user.metadata.lastLoginAt,
 				emailVerified: data.user.emailVerified,
 			});
+
+			setShowAuthModal(false);
+			setUserData(data.user);
+			toast.info("Signed in succeessfully");
 		}
 	}
 

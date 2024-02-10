@@ -1,10 +1,9 @@
 "use client";
-import Button from "@/components/Button/Button";
-import { setCreateCommunityModal } from "@/redux/actions";
+import Button from "@/components/UI/Button/Button";
 import Link from "next/link";
-import React from "react";
-import { useDispatch } from "react-redux";
+import React, { useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { createCommunityModalContext } from "@/contexts/CreateCommunityModalContext";
 
 const variants = (delay) => {
 	return {
@@ -32,7 +31,7 @@ const variants = (delay) => {
 };
 
 function CommunityNotFound() {
-	const dispatch = useDispatch();
+	const { setCreateCommunityModal } = useContext(createCommunityModalContext);
 
 	return (
 		<div className="mt-52 flex w-full flex-col items-center space-y-6 px-4 text-center">
@@ -64,9 +63,7 @@ function CommunityNotFound() {
 					exit="hidden"
 					className="flex items-center space-x-4 pt-8"
 				>
-					<div
-						onClick={() => dispatch(setCreateCommunityModal(true))}
-					>
+					<div onClick={() => setCreateCommunityModal(true)}>
 						<Button outline className="font-semibold">
 							Create Community
 						</Button>

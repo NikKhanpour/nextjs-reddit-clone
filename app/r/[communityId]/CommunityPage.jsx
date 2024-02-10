@@ -1,11 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
 "use client";
-import Button from "@/components/Button/Button";
+import Button from "@/components/UI/Button/Button";
 import useCommunityData from "@/hooks/useCommunityData";
 import React, { useContext, useEffect, useState } from "react";
 import { FaReddit } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { inputClasses } from "@/constants/inputClasses";
 import { IoImageOutline } from "react-icons/io5";
@@ -13,17 +10,15 @@ import { GoLink } from "react-icons/go";
 import PageLayout from "@/components/PageLayout/PageLayout";
 import { useRouter } from "next/navigation";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
-import { auth, firestore } from "@/firebase-config";
-import {
-	getUserCommunitySnippets,
-	setPosts,
-	setUserCommunitySnippets,
-} from "@/redux/actions";
+import { firestore } from "@/firebase-config";
 import Post from "./Post";
-import { themeContext } from "@/darkmode/ThemeContext";
+import { themeContext } from "@/contexts/ThemeContext";
 import AboutCommunity from "@/components/About/AboutCommunity";
-import useUserData from "@/hooks/useUserData";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { currentCommunityContext } from "@/contexts/CurrentCommunityContext";
+import { postsContext } from "@/contexts/PostsContext";
+import { userDataContext } from "@/contexts/UserDataContext";
+import InitialStates from "@/components/InitialStates";
+import Image from "next/image";
 
 const variants = {
 	hidden: {
@@ -48,33 +43,19 @@ const variants = {
 
 function CommunityPage({ community }) {
 	const router = useRouter();
-	const dispatch = useDispatch();
-	const [user] = useAuthState(auth);
 	const { darkmode } = useContext(themeContext);
 
-	const { currentCommunity } = useSelector((state) => state.community);
-	const { communitySnippets, votedPosts } = useSelector(
-		(state) => state.userData
-	);
-	const postsState = useSelector((state) => state.postsState);
+	const { communitySnippets } = useContext(userDataContext);
+	const { posts, setPosts } = useContext(postsContext);
 	const { onJoinOrLeaveCommunity, joinLoading } = useCommunityData();
-	const { getUserVotedPosts, getUserCommunitySnippets } = useUserData();
 
-	const [joinCheckLoading, setJoinCheckLoading] = useState(
-		user ? true : false
-	);
+	const [communitySnippetsLoading] = InitialStates();
+
 	const isJoined = !!communitySnippets.find(
 		(item) => item.communityId === community.communityId
 	);
 
-	useEffect(() => {
-		if (user) {
-			getUserVotedPosts(user.uid);
-			getUserCommunitySnippets(user.uid).then(() => {
-				setJoinCheckLoading(false);
-			});
-		}
-	}, [user]);
+	const { currentCommunity } = useContext(currentCommunityContext);
 
 	const [loading, setLoading] = useState(false);
 
@@ -93,7 +74,7 @@ function CommunityPage({ community }) {
 					id: doc.id,
 					...doc.data(),
 				}));
-				dispatch(setPosts(posts));
+				setPosts(posts);
 			} catch (error) {
 				console.log("getPosts on communityPage", error);
 			} finally {
@@ -101,7 +82,7 @@ function CommunityPage({ community }) {
 			}
 		}
 		getPosts();
-	}, [community, dispatch]);
+	}, [community, setPosts]);
 
 	return (
 		<>
@@ -116,10 +97,13 @@ function CommunityPage({ community }) {
 					<div className="h-[100px] w-full bg-blue-400" />
 					<div className="w-full bg-white pb-1 shadow-lg dark:bg-zinc-900">
 						<div className="mx-auto flex w-[95%] max-w-[1000px] items-center space-x-4">
-							{currentCommunity.imageURL ? (
+							{currentCommunity?.imageURL ? (
 								<div className="h-20 w-20">
-									<img
+									<Image
 										src={currentCommunity.imageURL}
+										width="100"
+										height="100"
+										priority
 										alt="community image"
 										className="relative -top-5 h-full w-full rounded-full border-2 border-white object-fill"
 									/>
@@ -148,7 +132,8 @@ function CommunityPage({ community }) {
 									<Button
 										outline={isJoined}
 										loading={
-											joinCheckLoading || joinLoading
+											communitySnippetsLoading ||
+											joinLoading
 										}
 										className="px-8"
 									>
@@ -187,8 +172,8 @@ function CommunityPage({ community }) {
 									`}
 							/>
 						) : (
-							postsState.posts &&
-							postsState.posts.map((post) => (
+							posts &&
+							posts.map((post) => (
 								<Post
 									key={post.id}
 									post={post}

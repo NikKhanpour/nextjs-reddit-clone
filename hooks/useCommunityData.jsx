@@ -1,23 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
+import { authModalContext } from "@/contexts/AuthModalContext";
+import { currentCommunityContext } from "@/contexts/CurrentCommunityContext";
+import { userDataContext } from "@/contexts/UserDataContext";
 import { auth, firestore } from "@/firebase-config";
-import {
-	setCurrentCommunity,
-	setShowAuthModal,
-	setUserCommunitySnippets,
-} from "@/redux/actions";
-import {
-	collection,
-	doc,
-	getDoc,
-	getDocs,
-	increment,
-	writeBatch,
-} from "firebase/firestore";
+import { doc, getDoc, increment, writeBatch } from "firebase/firestore";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useDispatch, useSelector } from "react-redux";
 
 function useCommunityData() {
 	const [joinLoading, setJoinLoading] = useState(false);
@@ -26,18 +16,18 @@ function useCommunityData() {
 
 	const [user] = useAuthState(auth);
 
-	const dispatch = useDispatch();
+	const { setCurrentCommunity } = useContext(currentCommunityContext);
 
-	const { currentCommunity } = useSelector((state) => state.community);
-
-	const { communitySnippets } = useSelector((state) => state.userData);
+	const { communitySnippets, setCommunitySnippets } =
+		useContext(userDataContext);
+	const { setShowAuthModal } = useContext(authModalContext);
 
 	async function getCurrentCommunityData(communityId) {
 		const communityDocRef = doc(firestore, "communities", communityId);
 		const community = await getDoc(communityDocRef);
 
 		if (community.exists()) {
-			dispatch(setCurrentCommunity({ ...community.data() }));
+			setCurrentCommunity({ ...community.data() });
 		}
 	}
 	useEffect(() => {
@@ -48,7 +38,7 @@ function useCommunityData() {
 
 	async function onJoinOrLeaveCommunity(community, isJoined) {
 		if (!user) {
-			dispatch(setShowAuthModal(true));
+			setShowAuthModal(true);
 			return;
 		}
 
@@ -76,17 +66,14 @@ function useCommunityData() {
 				);
 
 				await batch.commit();
-
-				dispatch(
-					setUserCommunitySnippets([
-						{
-							communityId: community.communityId,
-							imageURL: community.imageURL || "",
-							isModerator: user.uid === community.creatorId,
-						},
-						...communitySnippets,
-					])
-				);
+				setCommunitySnippets([
+					{
+						communityId: community.communityId,
+						imageURL: community.imageURL || "",
+						isModerator: user.uid === community.creatorId,
+					},
+					...communitySnippets,
+				]);
 			} catch (error) {
 				console.log("onJoinOrLeaveCommunity joining", error);
 			} finally {
@@ -114,12 +101,9 @@ function useCommunityData() {
 				);
 
 				await batch.commit();
-
-				dispatch(
-					setUserCommunitySnippets(
-						communitySnippets.filter(
-							(item) => item.communityId !== community.communityId
-						)
+				setCommunitySnippets(
+					communitySnippets.filter(
+						(item) => item.communityId !== community.communityId
 					)
 				);
 			} catch (error) {

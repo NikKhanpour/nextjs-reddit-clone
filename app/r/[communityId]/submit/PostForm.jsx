@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/components/Button/Button";
+import Button from "@/components/UI/Button/Button";
 import { inputClasses } from "@/constants/inputClasses";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";

@@ -1,17 +1,17 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useContext, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { inputClasses } from "@/constants/inputClasses";
-import { setCreateCommunityModal } from "@/redux/actions";
 import { IoPerson } from "react-icons/io5";
 import { MdRemoveRedEye } from "react-icons/md";
 import { IoLockClosed } from "react-icons/io5";
-import Button from "@/components/Button/Button";
+import Button from "@/components/UI/Button/Button";
 import { toast } from "react-toastify";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 import { auth, firestore } from "@/firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { createCommunityModalContext } from "@/contexts/CreateCommunityModalContext";
+import { authModalContext } from "@/contexts/AuthModalContext";
 
 const modalVariants = {
 	show: {
@@ -42,10 +42,9 @@ function CreateCommunityModal() {
 
 	const [user] = useAuthState(auth);
 
-	const createCommunityModal = useSelector(
-		(state) => state.createCommunityModal
-	);
-	const dispatch = useDispatch();
+	const { showCreateCommunityModal, setShowCreateCommunityModal } =
+		useContext(createCommunityModalContext);
+	const { setShowAuthModal } = useContext(authModalContext);
 
 	function handleChangeInput(e) {
 		if (e.target.value.length < 22) {
@@ -58,6 +57,12 @@ function CreateCommunityModal() {
 		const format = /[ `!@#$%^&*()_+\[\]{};':"\\|,.<>\/?~]/;
 		if (format.test(communityName) || communityName.length < 3) {
 			toast.error("Invalid Community Name");
+			return;
+		}
+		if (!user) {
+			setShowCreateCommunityModal(false);
+			setShowAuthModal(true);
+			return;
 		}
 
 		try {
@@ -100,7 +105,7 @@ function CreateCommunityModal() {
 				);
 				setLoading(false);
 				toast.info("Community Created");
-				dispatch(setCreateCommunityModal(false));
+				setShowCreateCommunityModal(false);
 			});
 		} catch (error) {
 			console.log("createCommunity", error);
@@ -108,8 +113,8 @@ function CreateCommunityModal() {
 	}
 
 	return (
-		<AnimatePresence animate={createCommunityModal ? "show" : "hidden"}>
-			{createCommunityModal && (
+		<AnimatePresence animate={showCreateCommunityModal ? "show" : "hidden"}>
+			{showCreateCommunityModal && (
 				<motion.div
 					variants={{ show: { opacity: 1 }, hidden: { opacity: 0 } }}
 					initial="hidden"
@@ -118,7 +123,7 @@ function CreateCommunityModal() {
 					id="backdrop"
 					onClick={(e) => {
 						e.target.id === "backdrop" &&
-							dispatch(setCreateCommunityModal(false));
+							setShowCreateCommunityModal(false);
 					}}
 					className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 px-2 backdrop-blur-sm"
 				>
@@ -182,7 +187,7 @@ function CreateCommunityModal() {
 										}
 										className="mx-4 h-4 w-4 cursor-pointer"
 									/>
-									<MdRemoveRedEye className="me-3 text-gray-600 dark:text-zinc-400" />
+									<MdRemoveRedEye className="me-3 h-6 w-6 text-gray-600 dark:text-zinc-400 sm:h-fit sm:w-fit" />
 									Restricted
 									<p className="ps-4 text-xs font-light text-opacity-30">
 										Anyone can view this community, but only
@@ -208,25 +213,25 @@ function CreateCommunityModal() {
 								</label>
 							</div>
 						</form>
-						<footer className="mt-3 w-full space-x-4 rounded-md bg-gray-100 px-4 py-3 text-xl font-semibold dark:bg-zinc-800">
-							<button
+						<footer className="mt-3 flex w-full space-x-4 rounded-md bg-gray-100 px-4 py-3 text-xl font-semibold dark:bg-zinc-800">
+							<div
 								onClick={() => {
-									dispatch(setCreateCommunityModal(false));
+									setShowCreateCommunityModal(false);
 									setCharsRemaining(21);
 								}}
 							>
 								<Button outline className="py-0.5 text-sm">
 									Cancel
 								</Button>
-							</button>
-							<button onClick={handleCreateCommunity}>
+							</div>
+							<div onClick={handleCreateCommunity}>
 								<Button
 									loading={loading}
-									className="py-0.5 text-sm"
+									className="w-40 py-0.5 text-sm"
 								>
 									Create Community
 								</Button>
-							</button>
+							</div>
 						</footer>
 					</motion.div>
 				</motion.div>

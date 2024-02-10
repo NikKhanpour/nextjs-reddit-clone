@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import { auth } from "@/firebase-config";
 import moment from "moment";
@@ -12,7 +11,7 @@ import { BiCommentDots } from "react-icons/bi";
 import { FiShare2 } from "react-icons/fi";
 import usePosts from "@/hooks/usePosts";
 import { toast } from "react-toastify";
-import { themeContext } from "@/darkmode/ThemeContext";
+import { themeContext } from "@/contexts/ThemeContext";
 import { useRouter } from "next/navigation";
 import {
 	IoArrowDownCircle,
@@ -20,7 +19,8 @@ import {
 	IoArrowUpCircle,
 	IoArrowUpCircleOutline,
 } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { userDataContext } from "@/contexts/UserDataContext";
+import Image from "next/image";
 
 const variants = {
 	hidden: {
@@ -51,19 +51,15 @@ function Post({ post, community }) {
 
 	const { deletePost, onVotePost } = usePosts();
 
-	const { votedPosts } = useSelector((state) => state.userData);
+	const { votedPosts } = useContext(userDataContext);
 	const [voteValue, setVoteValue] = useState(0);
 
 	useEffect(() => {
 		if (!user) {
 			setVoteValue(0);
 		} else {
-			if (votedPosts.length > 0) {
-				setVoteValue(
-					votedPosts.find((vote) => vote.postId === post.id)
-						?.voteValue
-				);
-			}
+			const vote = votedPosts.find((vote) => vote.postId === post.id);
+			vote ? setVoteValue(vote.voteValue) : setVoteValue(0);
 		}
 	}, [user, post.id, votedPosts]);
 
@@ -102,7 +98,8 @@ function Post({ post, community }) {
 				className="flex h-fit w-full cursor-pointer rounded-md border border-gray-100 bg-white dark:border-zinc-800 dark:bg-zinc-900"
 			>
 				<div className="flex flex-col items-center rounded-l-md bg-gray-100 p-2 dark:bg-zinc-800">
-					<div
+					<motion.div
+						whileHover={{ scale: 1.2 }}
 						onClick={(e) => {
 							e.stopPropagation();
 							onVotePost(post, 1);
@@ -113,9 +110,10 @@ function Post({ post, community }) {
 						) : (
 							<IoArrowUpCircleOutline className="h-6 w-6 cursor-pointer" />
 						)}
-					</div>
+					</motion.div>
 					<p className="text-xl">{post.voteStatus}</p>
-					<div
+					<motion.div
+						whileHover={{ scale: 1.2 }}
 						onClick={(e) => {
 							e.stopPropagation();
 							onVotePost(post, -1);
@@ -126,7 +124,7 @@ function Post({ post, community }) {
 						) : (
 							<IoArrowDownCircleOutline className="h-6 w-6 cursor-pointer" />
 						)}
-					</div>
+					</motion.div>
 				</div>
 				<div className="flex w-full flex-col space-y-2">
 					<div className="flex items-center ps-2 pt-2">
@@ -148,10 +146,13 @@ function Post({ post, community }) {
 							{post.body}
 						</p>
 						{post.imageURL && (
-							<img
+							<Image
 								src={post.imageURL}
+								width="500"
+								height="500"
+								priority
 								alt="image"
-								className="h-full w-full"
+								className="h-full max-h-[600px] w-full"
 							/>
 						)}
 					</div>

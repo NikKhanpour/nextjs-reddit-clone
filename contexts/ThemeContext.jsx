@@ -10,6 +10,13 @@ function ThemeContext({ children }) {
 	// 		? JSON.parse(localStorage.getItem("darkmode"))
 	// 		: false
 	// );
+	// useEffect(() => {
+	// 	setDarkmode(
+	// 		localStorage.getItem("darkmode")
+	// 			? JSON.parse(localStorage.getItem("darkmode"))
+	// 			: false
+	// 	);
+	// }, [setDarkmode]);
 
 	useEffect(() => {
 		document.body.classList.add("duration-300");
@@ -24,7 +31,7 @@ function ThemeContext({ children }) {
 			document.body.classList.add("bg-gray-200");
 			document.body.classList.remove("text-white");
 		}
-		// localStorage.setItem("darkmode", JSON.stringify(darkmode));
+		localStorage.setItem("darkmode", JSON.stringify(darkmode));
 	}, [darkmode]);
 
 	return (

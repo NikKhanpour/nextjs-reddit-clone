@@ -1,18 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
 import { inputClasses } from "@/constants/inputClasses";
-import Button from "../Button/Button";
-import {
-	setAuthModalStage,
-	setShowAuthModal,
-	setUserData,
-} from "@/redux/actions";
+import Button from "../UI/Button/Button";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth, firestore } from "@/firebase-config";
 import { toast } from "react-toastify";
 import { doc, updateDoc } from "firebase/firestore";
+import { authModalContext } from "@/contexts/AuthModalContext";
 
 const variants = {
 	show: {
@@ -36,8 +31,8 @@ const variants = {
 };
 
 function Login() {
-	const authModal = useSelector((state) => state.authModal);
-	const dispatch = useDispatch();
+	const { setShowAuthModal, authModalStage, setAuthModalStage } =
+		useContext(authModalContext);
 
 	const [signInWithEmailAndPassword, user, loading, error] =
 		useSignInWithEmailAndPassword(auth);
@@ -60,10 +55,8 @@ function Login() {
 			formData.password
 		);
 		if (data) {
-			dispatch(setShowAuthModal(false));
+			setShowAuthModal(false);
 			toast.info("Signed in successfully");
-
-			dispatch(setUserData(data.user));
 
 			const userDocRef = doc(firestore, "users", data.user.uid);
 			await updateDoc(userDocRef, {
@@ -80,7 +73,7 @@ function Login() {
 
 	return (
 		<AnimatePresence mode="popLayout">
-			{authModal.stage === "login" && (
+			{authModalStage === "login" && (
 				<motion.div
 					variants={variants}
 					initial="hidden"
@@ -141,9 +134,7 @@ function Login() {
 							<p className="pb-1 pt-2 text-sm">
 								Forgot your{" "}
 								<span
-									onClick={() =>
-										dispatch(setAuthModalStage("forgot"))
-									}
+									onClick={() => setAuthModalStage("forgot")}
 									className="cursor-pointer text-blue-500 dark:text-blue-600"
 								>
 									Password?
@@ -152,9 +143,7 @@ function Login() {
 							<p className="pb-2 text-sm">
 								New to Reddit{" "}
 								<span
-									onClick={() =>
-										dispatch(setAuthModalStage("signUp"))
-									}
+									onClick={() => setAuthModalStage("signUp")}
 									className="cursor-pointer text-blue-500 dark:text-blue-600"
 								>
 									Sign Up

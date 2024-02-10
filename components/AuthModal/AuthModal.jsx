@@ -1,29 +1,26 @@
 "use client";
-import React from "react";
+import React, { useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import GoogleProvider from "./GoogleProvider";
-import { useDispatch, useSelector } from "react-redux";
-import { setShowAuthModal } from "@/redux/actions";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import Forgot from "./Forgot";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase-config";
+import { authModalContext } from "@/contexts/AuthModalContext";
 
 function AuthModal() {
-	const dispatch = useDispatch();
-	const authModal = useSelector((state) => state.authModal);
+	const { showAuthModal, setShowAuthModal } = useContext(authModalContext);
 
 	const [user] = useAuthState(auth);
 
 	return (
-		<AnimatePresence animate={authModal.show ? "show" : "hidden"}>
-			{!user && authModal.show && (
+		<AnimatePresence animate={showAuthModal ? "show" : "hidden"}>
+			{!user && showAuthModal && (
 				<motion.div
 					id="backdrop"
 					onClick={(e) =>
-						e.target.id === "backdrop" &&
-						dispatch(setShowAuthModal(false))
+						e.target.id === "backdrop" && setShowAuthModal(false)
 					}
 					variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
 					initial="hidden"
