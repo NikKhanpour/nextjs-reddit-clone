@@ -7,6 +7,7 @@ function UserDataContext({ children }) {
 	const [userData, setUserData] = useState(null);
 	const [communitySnippets, setCommunitySnippets] = useState([]);
 	const [votedPosts, setVotedPosts] = useState([]);
+	const [snippetsFetched, setSnippetsFetched] = useState(false);
 
 	return (
 		<userDataContext.Provider
@@ -17,6 +18,8 @@ function UserDataContext({ children }) {
 				setCommunitySnippets,
 				votedPosts,
 				setVotedPosts,
+				snippetsFetched,
+				setSnippetsFetched,
 			}}
 		>
 			{children}

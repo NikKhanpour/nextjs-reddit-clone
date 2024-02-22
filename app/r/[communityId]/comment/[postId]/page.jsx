@@ -1,3 +1,4 @@
+"use client";
 import { firestore } from "@/firebase-config";
 import {
 	collection,

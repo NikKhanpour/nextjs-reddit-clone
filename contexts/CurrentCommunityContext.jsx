@@ -6,7 +6,10 @@ function CurrentCommunityContext({ children }) {
 	const [currentCommunity, setCurrentCommunity] = useState(null);
 	return (
 		<currentCommunityContext.Provider
-			value={{ currentCommunity, setCurrentCommunity }}
+			value={{
+				currentCommunity,
+				setCurrentCommunity,
+			}}
 		>
 			{children}
 		</currentCommunityContext.Provider>

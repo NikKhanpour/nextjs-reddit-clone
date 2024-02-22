@@ -12,6 +12,8 @@ import { auth, firestore } from "@/firebase-config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { createCommunityModalContext } from "@/contexts/CreateCommunityModalContext";
 import { authModalContext } from "@/contexts/AuthModalContext";
+import { userDataContext } from "@/contexts/UserDataContext";
+import { useRouter } from "next/navigation";
 
 const modalVariants = {
 	show: {
@@ -35,6 +37,7 @@ const modalVariants = {
 };
 
 function CreateCommunityModal() {
+	const router = useRouter();
 	const [communityName, setCommunityName] = useState("");
 	const [charsRemaining, setCharsRemaining] = useState(21);
 	const [communityType, setCommunityType] = useState("public");
@@ -45,6 +48,9 @@ function CreateCommunityModal() {
 	const { showCreateCommunityModal, setShowCreateCommunityModal } =
 		useContext(createCommunityModalContext);
 	const { setShowAuthModal } = useContext(authModalContext);
+
+	const { communitySnippets, setCommunitySnippets } =
+		useContext(userDataContext);
 
 	function handleChangeInput(e) {
 		if (e.target.value.length < 22) {
@@ -106,7 +112,17 @@ function CreateCommunityModal() {
 				setLoading(false);
 				toast.info("Community Created");
 				setShowCreateCommunityModal(false);
+
+				setCommunitySnippets([
+					{
+						communityId: communityName,
+						imageURL: "",
+						isModerator: true,
+					},
+					...communitySnippets,
+				]);
 			});
+			router.push(`/r/${communityName}`);
 		} catch (error) {
 			console.log("createCommunity", error);
 		}
@@ -226,6 +242,7 @@ function CreateCommunityModal() {
 							</div>
 							<div onClick={handleCreateCommunity}>
 								<Button
+									type={"submit"}
 									loading={loading}
 									className="w-40 py-0.5 text-sm"
 								>

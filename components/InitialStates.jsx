@@ -1,14 +1,28 @@
 "use client";
+import { currentCommunityContext } from "@/contexts/CurrentCommunityContext";
 import { userDataContext } from "@/contexts/UserDataContext";
 import { auth, firestore } from "@/firebase-config";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { usePathname, useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 function InitialStates() {
+	const { setCurrentCommunity } = useContext(currentCommunityContext);
+	const path = usePathname();
+	useEffect(() => {
+		if (!path.includes("/r/")) {
+			setCurrentCommunity(null);
+		}
+	}, [path, setCurrentCommunity]);
+
 	const [user] = useAuthState(auth);
-	const { setVotedPosts, setCommunitySnippets, setUserData } =
-		useContext(userDataContext);
+	const {
+		setVotedPosts,
+		setCommunitySnippets,
+		setUserData,
+		setSnippetsFetched,
+	} = useContext(userDataContext);
 
 	const [votedPostsLoading, setVotedPostsLoading] = useState(false);
 	const [communitySnippetsLoading, setCommunitySnippetsLoading] =
@@ -68,6 +82,7 @@ function InitialStates() {
 							...doc.data(),
 						}));
 					setCommunitySnippets(communitySnippetsSnapshot);
+					setSnippetsFetched(true);
 				} catch (error) {
 					console.log("initial communitySnippets", error);
 				} finally {
@@ -76,7 +91,13 @@ function InitialStates() {
 			}
 		}
 		getUserData();
-	}, [user, setCommunitySnippets, setVotedPosts, setUserData]);
+	}, [
+		user,
+		setCommunitySnippets,
+		setVotedPosts,
+		setUserData,
+		setSnippetsFetched,
+	]);
 	return [communitySnippetsLoading, votedPostsLoading, userDataLoading];
 }
 

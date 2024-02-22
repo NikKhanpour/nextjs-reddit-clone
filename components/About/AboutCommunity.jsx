@@ -83,14 +83,14 @@ function AboutCommunity() {
 		}
 	}
 
-	useEffect(() => {
-		// setLoading(true);
-		getCurrentCommunityData(communityId);
-	}, [getCurrentCommunityData, communityId, currentCommunity]);
+	// useEffect(() => {
+	// 	// setLoading(true);
+	// 	getCurrentCommunityData(communityId);
+	// }, []);
 
 	return (
 		<AnimatePresence>
-			{!loading && (
+			{currentCommunity && (
 				<motion.div
 					variants={variants}
 					initial="hidden"
@@ -104,7 +104,7 @@ function AboutCommunity() {
 					</div>
 					<div className="flex w-full items-center justify-between px-5">
 						<div className="flex flex-col">
-							<p>{currentCommunity?.numberOfMembers}</p>
+							<p>{currentCommunity.numberOfMembers}</p>
 							<p>Members</p>
 						</div>
 						<div className="flex flex-col">
@@ -119,7 +119,7 @@ function AboutCommunity() {
 							Created{" "}
 							{moment(
 								new Date(
-									currentCommunity?.createdAt?.seconds * 1000
+									currentCommunity.createdAt?.seconds * 1000
 								)
 							).fromNow()}
 						</p>
@@ -127,7 +127,7 @@ function AboutCommunity() {
 					<div
 						onClick={() =>
 							router.push(
-								`/r/${currentCommunity?.communityId}/submit`
+								`/r/${currentCommunity.communityId}/submit`
 							)
 						}
 					>
@@ -135,7 +135,7 @@ function AboutCommunity() {
 							Create Post
 						</Button>
 					</div>
-					{currentCommunity?.creatorId === user?.uid && (
+					{currentCommunity.creatorId === user?.uid && (
 						<div className="flex flex-col">
 							<p className="font-medium">Admin</p>
 							<div

@@ -140,8 +140,25 @@ function Post({ post, commentsFetch }) {
 							</div>
 							<div className="flex w-full flex-col space-y-2">
 								<div className="flex items-center ps-2 pt-2">
-									<FaReddit className="h-5 w-5" />
-									<p className="ps-1 text-sm font-medium">
+									{post.communityImageURL ? (
+										<Image
+											src={post.communityImageURL}
+											alt="community-image"
+											width="20"
+											height="20"
+											className="h-6 w-6 rounded-full"
+										/>
+									) : (
+										<FaReddit className="h-5 w-5" />
+									)}
+									<p
+										onClick={() =>
+											router.push(
+												`/r/${post.communityId}`
+											)
+										}
+										className="cursor-pointer ps-1 text-sm font-medium duration-200 hover:underline hover:underline-offset-2"
+									>
 										r/
 										{currentCommunity?.communityId}
 									</p>

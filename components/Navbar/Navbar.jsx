@@ -7,7 +7,7 @@ import AuthModal from "../AuthModal/AuthModal";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase-config";
 import ProfileDropdown from "./Dropdowns/ProfileDropdown";
-import HomeDropdown from "./Dropdowns/HomeDropdown";
+import HomeDropdown from "./Dropdowns/HomeDropdown/HomeDropdown";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { authModalContext } from "@/contexts/AuthModalContext";

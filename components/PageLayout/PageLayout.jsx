@@ -40,7 +40,7 @@ function PageLayout({ children }) {
 					exit="hidden"
 					className="mx-auto flex h-fit w-[95%] max-w-[1000px] justify-center md:space-x-6"
 				>
-					<div className="flex w-full flex-col md:w-[65%]">
+					<div className="flex w-full flex-col md:w-[70%]">
 						{children && children[0]}
 					</div>
 					<div className="hidden flex-grow flex-col md:flex">

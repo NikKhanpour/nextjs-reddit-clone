@@ -11,7 +11,7 @@ import PageLayout from "@/components/PageLayout/PageLayout";
 import { useRouter } from "next/navigation";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { firestore } from "@/firebase-config";
-import Post from "./Post";
+import Post from "../../../components/Post/Post";
 import { themeContext } from "@/contexts/ThemeContext";
 import AboutCommunity from "@/components/About/AboutCommunity";
 import { currentCommunityContext } from "@/contexts/CurrentCommunityContext";
@@ -171,15 +171,18 @@ function CommunityPage({ community }) {
 									${darkmode ? "spinner-white-large" : "spinner-dark-large"}
 									`}
 							/>
-						) : (
-							posts &&
+						) : posts.length > 0 ? (
 							posts.map((post) => (
 								<Post
 									key={post.id}
 									post={post}
-									community={community}
+									communityId={community.communityId}
 								/>
 							))
+						) : (
+							<p className="pt-5 text-2xl text-gray-400 dark:text-zinc-600">
+								No Posts Yet...
+							</p>
 						)}
 					</div>
 				</>

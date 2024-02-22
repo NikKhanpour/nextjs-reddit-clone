@@ -19,12 +19,20 @@ function ProfileDropdown() {
 	const [signOut, loading, error] = useSignOut(auth);
 
 	const { darkmode, setDarkmode } = useContext(themeContext);
-	const { setUserData } = useContext(userDataContext);
+	const {
+		setUserData,
+		setCommunitySnippets,
+		setVotedPosts,
+		setSnippetsFetched,
+	} = useContext(userDataContext);
 
 	async function handleSignOut() {
 		const success = await signOut();
 		if (success) {
 			setUserData(null);
+			setCommunitySnippets([]);
+			setVotedPosts([]);
+			setSnippetsFetched(false);
 		}
 	}
 	return (

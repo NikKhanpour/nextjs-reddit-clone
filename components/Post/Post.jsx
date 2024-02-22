@@ -43,7 +43,7 @@ const variants = {
 	},
 };
 
-function Post({ post, community }) {
+function Post({ post, communityId, homePage }) {
 	const [user] = useAuthState(auth);
 	const router = useRouter();
 	const [deleteLoading, setDeleteLoading] = useState(false);
@@ -83,13 +83,16 @@ function Post({ post, community }) {
 		}
 	}
 
+	function redirectToCommunityPage(e) {
+		e.stopPropagation();
+		router.push(`/r/${communityId}`);
+	}
+
 	return (
 		<AnimatePresence mode="popLayout">
 			<motion.div
 				onClick={() =>
-					router.push(
-						`/r/${community.communityId}/comment/${post.id}`
-					)
+					router.push(`/r/${communityId}/comment/${post.id}`)
 				}
 				variants={variants}
 				initial="hidden"
@@ -127,19 +130,44 @@ function Post({ post, community }) {
 					</motion.div>
 				</div>
 				<div className="flex w-full flex-col space-y-2">
-					<div className="flex items-center ps-2 pt-2">
-						<FaReddit className="h-5 w-5" />
-						<p className="ps-1 text-sm font-medium">
-							r/{community.communityId}
-						</p>
-						<p className="ps-1 text-xs text-black text-opacity-30 dark:text-white dark:text-opacity-30">
-							- posted by u/
-							{post.creatorDisplayName}{" "}
-							{moment(
-								new Date(post.createdAt?.seconds * 1000)
-							).fromNow()}
-						</p>
-					</div>
+					{homePage ? (
+						<div className="flex items-center ps-2 pt-2">
+							{post.communityImageURL ? (
+								<Image
+									src={post.communityImageURL}
+									alt="community-image"
+									width="20"
+									height="20"
+									className="h-6 w-6 rounded-full"
+								/>
+							) : (
+								<FaReddit className="h-5 w-5" />
+							)}
+							<p
+								onClick={(e) => redirectToCommunityPage(e)}
+								className="ps-1 text-sm font-medium duration-200 hover:underline hover:underline-offset-2"
+							>
+								r/{communityId}
+							</p>
+							<p className="ps-1 text-xs text-black text-opacity-50 dark:text-white dark:text-opacity-50">
+								- posted by u/
+								{post.creatorDisplayName}{" "}
+								{moment(
+									new Date(post.createdAt?.seconds * 1000)
+								).fromNow()}
+							</p>
+						</div>
+					) : (
+						<div className="flex items-center ps-2 pt-2">
+							<p className="text-xs text-black text-opacity-50 dark:text-white dark:text-opacity-50">
+								posted by u/
+								{post.creatorDisplayName}{" "}
+								{moment(
+									new Date(post.createdAt?.seconds * 1000)
+								).fromNow()}
+							</p>
+						</div>
+					)}
 					<div className="flex flex-col space-y-2 px-2">
 						<p className="text-lg font-medium">{post.title}</p>
 						<p className="pb-2 text-sm font-extralight">

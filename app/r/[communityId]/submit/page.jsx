@@ -21,6 +21,7 @@ import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { toast } from "react-toastify";
 import AboutCommunity from "@/components/About/AboutCommunity";
 import { authModalContext } from "@/contexts/AuthModalContext";
+import { currentCommunityContext } from "@/contexts/CurrentCommunityContext";
 
 const tabs = [
 	{ name: "Post", icon: <IoDocumentText className="z-10 h-6 w-6" /> },
@@ -45,6 +46,7 @@ function CreatePostPage() {
 
 	const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
 	const { setShowAuthModal } = useContext(authModalContext);
+	const { currentCommunity } = useContext(currentCommunityContext);
 
 	async function createPost(e) {
 		e.preventDefault();
@@ -69,6 +71,9 @@ function CreatePostPage() {
 			voteStatus: 0,
 			numberOfComments: 0,
 			createdAt: serverTimestamp(),
+			communityImageURL: currentCommunity.imageURL
+				? currentCommunity.imageURL
+				: "",
 		};
 
 		try {
