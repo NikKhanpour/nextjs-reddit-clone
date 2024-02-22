@@ -10,7 +10,7 @@ import {
 	where,
 } from "firebase/firestore";
 import React from "react";
-import Post from "./_components/Post";
+import Post from "./components/Post";
 
 export async function getPostAndComments(postId) {
 	try {
