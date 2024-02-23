@@ -28,7 +28,7 @@ import { VscBookmark } from "react-icons/vsc";
 import { toast } from "react-toastify";
 import CommentInput from "./CommentInput";
 import { commentsContext } from "@/contexts/CommentsContext";
-import Comment from "./comment";
+import Comment from "./Comment";
 
 const variants = {
 	hidden: {
